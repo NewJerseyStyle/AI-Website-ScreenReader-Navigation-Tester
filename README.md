@@ -17,17 +17,47 @@ The specific goals to be achieved by the system are defined in a configuration f
 
 ## Technology Stack
 
-* **Programming Language:** [Specify your chosen language, e.g., Python]
-* **Screen Reader:** [Specify the screen reader used, e.g., NVDA, JAWS]
-* **AI Libraries:** [Specify AI libraries used, e.g., TensorFlow, PyTorch]
-* **Webdriver:** [Specify the webdriver used, e.g., Selenium]
+* **Programming Language:** Javascript
+* **Screen Reader:** NVDA
+* **AI Libraries:** Langchain, Zod
+* **Webdriver:** Playwright
 
 
 ## Setup and Usage
 
-1. **Install Dependencies:** [Instructions on how to install necessary libraries]
-2. **Configure Goals:** Modify the `goals.json` file to specify the goals for the website navigation and accessibility checks.  The format should be clear and easy to understand for non-programmers.
-3. **Run the Script:** Execute the main script to start the process. The script will interact with the website using the screen reader and output a report of achieved and failed goals, along with potential usability issues.
+1. **Install Dependencies:** 
+   - Ensure you have Node.js and npm installed.
+   - Install the project dependencies by running: `npm install` in the project directory. This will install all necessary packages listed in `package.json`.
+2. **Configure Goals:** 
+   - Create a JSON file (e.g., `example-goals.json`) to define the testing goals. 
+   - Each goal should be an object in an array with a `"goal"` property. Optionally, you can include an `"expect"` property for expected outcomes.
+   - Example `example-goals.json`:
+     ```json
+     [
+         {
+             "goal": "Navigate to the homepage."
+         },
+         {
+             "goal": "View the homepage and guess what the site is about.",
+             "expect": "It is the source code repository of software."
+         }
+     ]
+     ```
+3. **Run the Script:**
+   - Create a `.env` file in the project directory and add your Groq API key and model information:
+     ```env
+     GROQ_API_KEY=your-api-key
+     GROQ_MODEL=llama-3.3-70b-versatile
+     GROQ_MODEL_TEMP=0
+     ```
+   - Execute the `index.js` script using Node.js, providing the target URL and the path to your goals JSON file as arguments:
+     ```bash
+     node index.js <URL_to_test> -f <path_to_goals_json_file>
+     ```
+     For example:
+     ```bash
+     node index.js https://github.com/guidepup/guidepup -f example-goals.json
+     ```
 
 ## Results
 

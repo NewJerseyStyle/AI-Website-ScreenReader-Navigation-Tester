@@ -1,0 +1,42 @@
+{
+  "name": "screenreader-ux-checkbot",
+  "version": "0.0.1",
+  "description": "Proof of concept for an AI-powered system that uses a screen reader to assess the user experience (UX) of a website for users with visual impairments. The AI simulates human interaction, providing a report on achieved and failed goals, focusing on ease of use and accessibility.",
+  "main": "index.js",
+  "bin": {
+    "test": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NewJerseyStyle/AI-Website-ScreenReader-Navigation-Tester.git"
+  },
+  "keywords": [
+    "web accessibility",
+    "accessibility testing",
+    "screen reader",
+    "automated testing",
+    "unit testing",
+    "e2e testing",
+    "accessibility checker"
+  ],
+  "author": "NewJerseyStyle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NewJerseyStyle/AI-Website-ScreenReader-Navigation-Tester/issues"
+  },
+  "homepage": "https://github.com/NewJerseyStyle/AI-Website-ScreenReader-Navigation-Tester#readme",
+  "dependencies": {
+    "@langchain/core": "^0.3.42",
+    "@langchain/groq": "^0.2.0",
+    "commander": "^13.1.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@guidepup/guidepup": "^0.24.0",
+    "@guidepup/playwright": "^0.14.2",
+    "@playwright/test": "^1.51.1"
+  }
+}
