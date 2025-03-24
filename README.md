@@ -26,21 +26,10 @@ The specific goals to be achieved by the system are defined in a configuration f
 ## Setup and Usage
 
 1.  **Install Dependencies:**
-    *   Ensure you have Node.js and npm installed.
-    *   Install the project dependencies by running: `npm install` in the project directory. This will install all necessary packages listed in `package.json`.
-    *   Setup your environment for screen reader automation with [@guidepup/setup](https://www.npmjs.com/package/@guidepup/setup):
-
-        ```bash
-        npx @guidepup/setup
-
-        # Install dependencies.
-        npm install @guidepup/playwright @playwright/test
-
-        # Install WebKit browser for Playwright.
-        npx playwright install webkit
-
-        # Or you can let Playwright pick its favorite browser.
-        npx playwright install
+    *   Ensure you have Node.js, npm and [NVDA](https://www.nvaccess.org/download/) installed.
+    *   Install dependencies and setup the environment for screen reader automation with [setup.sh](setup.sh):
+        ```sh
+        sh setup.sh
         ```
 2.  **Configure Goals:**
     *   Create a JSON file (e.g., `goals.json`) to define the testing goals.
