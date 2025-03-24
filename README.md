@@ -89,7 +89,9 @@ The AI testing methodology is designed to simulate real-world user interactions.
 
 ## Limitations
 
-The AI testing system only consider keyboard navigation. Do not provide insights in touch screen and may need more instruction in order to control the behavior to mimic specific operation styles (e.g. reading each element on website vs jumping to next header).
+1. The AI testing system only consider keyboard navigation. Did not provide insights in touch screen.
+2. The AI may need more instruction in order to control the behavior to mimic specific operation styles (e.g. reading each element on website vs jumping to next header).
+3. The screen reader support only added for NVDA, VoiceOver also supported by not implemented.
 
 ## Contributing
 
