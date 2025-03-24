@@ -34,6 +34,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Set Up Environment For Screen Reader Automation
-      uses: guidepup/setup-action@0
+      uses: guidepup/setup-action@0.17.2
     - run: sh setup.sh
     - run: npx playwright test
