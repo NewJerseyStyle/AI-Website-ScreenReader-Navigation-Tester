@@ -28,13 +28,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set Up Environment For Screen Reader Automation
-      uses: guidepup/setup-action
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - name: Set Up Environment For Screen Reader Automation
+      uses: guidepup/setup-action@0
     - run: sh setup.sh
-    - run: npx @guidepup/setup
     - run: npx playwright test
