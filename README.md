@@ -18,9 +18,9 @@ The specific goals to be achieved by the system are defined in a configuration f
 ## Technology Stack
 
 * **Programming Language:** Javascript
-* **Screen Reader:** NVDA
+* **Screen Reader:** [NVDA](https://www.nvaccess.org/download/), [Guidepup](https://www.guidepup.dev/)
 * **AI Libraries:** Langchain, Zod
-* **Webdriver:** Playwright
+* **Webdriver:** [Playwright](https://playwright.dev/)
 
 
 ## Setup and Usage
