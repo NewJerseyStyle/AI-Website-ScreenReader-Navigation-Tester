@@ -1,6 +1,6 @@
 #! /usr/bin/env node
-const fs = require('fs');
-const { program } = require('commander');
+import * as fs from 'fs';
+import { program } from 'commander';
 
 program
   .version('0.0.1')
@@ -11,37 +11,35 @@ program
 const url = program.args[0];
 const filePath = program.opts().file;
 
-if (argument) {
+try {
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
   try {
-    const fileContents = fs.readFileSync(filePath, 'utf-8');
-    try {
-      const parsedData = JSON.parse(fileContents);
-      if (!Array.isArray(parsedData)) {
-        throw new Error('The JSON file must contain an array.');
-      }
-      parsedData.forEach(item => {
-        if (typeof item !== 'object' || item === null || !('goal' in item)) {
-          throw new Error('Each element in the array must be an object with "goal" property.');
-        }
-      });
-    } catch (parseError) {
-      console.error("Invalid JSON file format:", parseError.message);
-      process.exit(1);
+    const parsedData = JSON.parse(fileContents);
+    if (!Array.isArray(parsedData)) {
+      throw new Error('The JSON file must contain an array.');
     }
-  } catch (error) {
-    console.error("Invalid JSON file provided:", error.message);
+    parsedData.forEach(item => {
+      if (typeof item !== 'object' || item === null || !('goal' in item)) {
+        throw new Error('Each element in the array must be an object with "goal" property.');
+      }
+    });
+  } catch (parseError) {
+    console.error("Invalid JSON file format:", parseError.message);
     process.exit(1);
   }
+} catch (error) {
+  console.error("Invalid JSON file provided:", error.message);
+  process.exit(1);
 }
 
-const { nvdaTest as test } = require("@guidepup/playwright");
-const { expect } = require("@playwright/test");
-const{ tool } = require("@langchain/core/tools");
-const  { z } = require("zod");
-const { ChatGroq } = require("@langchain/groq");
-const { ChatPromptTemplate } = require("@langchain/core/prompts");
-const  { createToolCallingAgent } = require("langchain/agents");
-const  { AgentExecutor } = require("langchain/agents");
+import { nvdaTest as test } from "@guidepup/playwright";
+import { expect } from "@playwright/test";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
+import { ChatGroq } from "@langchain/groq";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { createToolCallingAgent } from "langchain/agents";
+import { AgentExecutor } from "langchain/agents";
 
 const llm = new ChatGroq({
   model: process.env.GROQ_MODEL,

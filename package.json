@@ -2,6 +2,7 @@
   "name": "screenreader-ux-checkbot",
   "version": "0.0.1",
   "description": "Proof of concept for an AI-powered system that uses a screen reader to assess the user experience (UX) of a website for users with visual impairments. The AI simulates human interaction, providing a report on achieved and failed goals, focusing on ease of use and accessibility.",
+  "type": "module",
   "main": "index.js",
   "bin": {
     "test": "index.js"
@@ -32,6 +33,7 @@
     "@langchain/core": "^0.3.42",
     "@langchain/groq": "^0.2.0",
     "commander": "^13.1.0",
+    "langchain": "^0.3.19",
     "zod": "^3.24.2"
   },
   "devDependencies": {
