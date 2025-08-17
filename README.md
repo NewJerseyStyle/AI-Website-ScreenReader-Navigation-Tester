@@ -49,11 +49,24 @@ The test configuration is managed through GitHub Actions secrets and variables.
 
 2.  **Configure Environment Variables:**
     *   The environment variables for the test are defined in the `.github/workflows/node.js.yml` file and should be configured in your repository's "Settings" > "Secrets and variables" > "Actions".
-    *   **Secrets:**
-        *   `GROQ_API_KEY`: Your Groq API key. This should be stored as a secret.
-    *   **Variables:**
-        *   `GROQ_MODEL`: The Groq model to use (e.g., `llama-3.3-70b-versatile`).
-        *   `GROQ_MODEL_TEMP`: The temperature for the model (e.g., `0`).
+    *   The test script can use either the Groq API or any other OpenAI-compatible API endpoint.
+
+    *   **Using Groq (Default):**
+        *   **Secrets:**
+            *   `GROQ_API_KEY`: Your Groq API key.
+        *   **Variables:**
+            *   `GROQ_MODEL`: The Groq model to use (e.g., `llama-3.3-70b-versatile`).
+            *   `GROQ_MODEL_TEMP`: The temperature for the model (e.g., `0`).
+
+    *   **Using a custom OpenAI-compatible endpoint:**
+        *   **Secrets:**
+            *   `OPENAI_API_KEY`: Your API key for the custom endpoint.
+        *   **Variables:**
+            *   `OPENAI_API_BASE`: The base URL of your custom OpenAI-compatible endpoint.
+            *   `OPENAI_MODEL`: The model to use (e.g., `gpt-4`).
+            *   `OPENAI_MODEL_TEMP`: The temperature for the model (e.g., `0`).
+
+    *   **Common Variables:**
         *   `TEST_ENTRY_URL`: The URL of the website to test.
         *   `TEST_CASE_JSON_PATH`: The path to the JSON file containing the test goals (e.g., `example-goals.json`).
 
@@ -72,7 +85,7 @@ For local development, you can still run the tests using Playwright. Make sure y
     npx playwright install --with-deps webkit
     ```
 3.  **Set Environment Variables:**
-    Create a `.env` file and add the necessary variables (see above).
+    Create a `.env` file and add the necessary variables depending on the service you want to use (Groq or a custom OpenAI-compatible endpoint).
 4.  **Run Tests:**
     ```bash
     npx playwright test

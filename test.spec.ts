@@ -6,10 +6,12 @@ import { createToolCallingAgent, AgentExecutor } from "langchain/agents";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { tool } from "@langchain/core/tools";
 import { ChatGroq } from "@langchain/groq";
+import { ChatOpenAI } from "@langchain/openai";
 import { z } from "zod";
 
 const url = process.env.TEST_ENTRY_URL;
 const filePath = process.env.TEST_CASE_JSON_PATH || "example-goals.json";
+const failures = [];
 
 if (!url) {
   console.error("TEST_ENTRY_URL is not defined in the environment variables.");
@@ -55,23 +57,52 @@ try {
   process.exit(1);
 }
 
-const llm = new ChatGroq({
-  model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
-  temperature: parseFloat(process.env.GROQ_MODEL_TEMP || "0")
-});
+let llm;
+let model;
 
-const model = new ChatGroq({
-  model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
-}).bind({
-  response_format: { type: "json_object" },
-});
+const openAIBaseUrl = process.env.OPENAI_API_BASE;
+const groqApiKey = process.env.GROQ_API_KEY;
+const openAIApiKey = process.env.OPENAI_API_KEY;
+
+if (openAIBaseUrl && !openAIBaseUrl.includes("groq.com")) {
+  // Use OpenAI compatible endpoint
+  const openAIOptions = {
+    modelName: process.env.OPENAI_MODEL || "gpt-4",
+    temperature: parseFloat(process.env.OPENAI_MODEL_TEMP || "0"),
+    apiKey: openAIApiKey,
+    baseURL: openAIBaseUrl,
+  };
+  llm = new ChatOpenAI(openAIOptions);
+  model = new ChatOpenAI({ ...openAIOptions, temperature: 0 }).bind({
+    response_format: { type: "json_object" },
+  });
+} else {
+  // Default to Groq
+  const groqOptions: {
+    model: string;
+    temperature: number;
+    apiKey: string;
+    baseURL?: string;
+  } = {
+    model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    temperature: parseFloat(process.env.GROQ_MODEL_TEMP || "0"),
+    apiKey: groqApiKey,
+  };
+  if(openAIBaseUrl) {
+    groqOptions.baseURL = openAIBaseUrl;
+  }
+  llm = new ChatGroq(groqOptions);
+  model = new ChatGroq({ ...groqOptions, temperature: 0 }).bind({
+    response_format: { type: "json_object" },
+  });
+}
 
 test.describe("Playwright NVDA", () => {
   if (filePath) {
     try {
       const fileContents = fs.readFileSync(filePath, 'utf-8');
       const parsedData = JSON.parse(fileContents);
-  
+
       parsedData.forEach(item => {
         test(item.goal, async ({
           page,
@@ -81,14 +112,14 @@ test.describe("Playwright NVDA", () => {
           await page.goto(url, {
             waitUntil: "load",
           });
-      
+
           // Wait for page to be ready and setup
           const header = page.locator('header');
           await header.waitFor();
-      
+
           // Interact with the page
           await nvda.navigateToWebContent();
-          
+
           const keyboardNaviNextItemTool = tool(
             async () => {
               await nvda.next();
@@ -444,7 +475,6 @@ test.describe("Playwright NVDA", () => {
             pressEnterTool
           ];
 
-          // maybe put the goal in system prompt will be better?
           const prompt = ChatPromptTemplate.fromMessages([
             ["system", "You are a tester, navigate the website using screen reader try your best to understand the website and finish the given task, home page is opened for you."],
             ["placeholder", "{chat_history}"],
@@ -457,35 +487,83 @@ test.describe("Playwright NVDA", () => {
             tools,
             prompt,
           });
+
           const agentExecutor = new AgentExecutor({
             agent,
             tools,
           });
 
-          let agentOutput = await agentExecutor.invoke({ input: item.goal });
+          let agentOutput;
 
-          if ('expect' in item) {
-            const aiMsg = await model.invoke(
-              "# task: Judge and return JSON with property 'conclusion' as true or false\n# Problem: Does the conclusion of the agent align with our expectated intepretation?\n# Expectation: " + item.expect + "\n# Context: " + agentOutput.messages[agentOutput.messages.length - 1].content
-            );
-            // console.log(aiMsg.content);
-            const aiMsgContent = JSON.parse(aiMsg.content);
-            expect(aiMsgContent.conclusion).toBe(true);
-          } else {
-            const the_log = await nvda.spokenPhraseLog();
-            const aiMsg = await model.invoke(
-              "# task: Judge and return JSON with property'conclusion' as true or false\n# Problem: Based on the log, did agent achieve its goal?\n# Expectation: " + item.goal + "\n# The Log: " + the_log
-            );
-            // console.log(aiMsg.content);
-            const aiMsgContent = JSON.parse(aiMsg.content);
-            expect(aiMsgContent.conclusion).toBe(true);
+          try {
+            agentOutput = await agentExecutor.invoke({ input: item.goal });
+
+            if ('expect' in item) {
+              const aiMsg = await model.invoke(
+                "# task: Judge and return JSON with property 'conclusion' as true or false\n# Problem: Does the conclusion of the agent align with our expectated intepretation?\n# Expectation: " + item.expect + "\n# Context: " + agentOutput.messages[agentOutput.messages.length - 1].content
+              );
+              const aiMsgContent = JSON.parse(aiMsg.content);
+              expect(aiMsgContent.conclusion).toBe(true);
+            } else {
+              const the_log = await nvda.spokenPhraseLog();
+              const aiMsg = await model.invoke(
+                "# task: Judge and return JSON with property'conclusion' as true or false\n# Problem: Based on the log, did agent achieve its goal?\n# Expectation: " + item.goal + "\n# The Log: " + the_log
+              );
+              const aiMsgContent = JSON.parse(aiMsg.content);
+              expect(aiMsgContent.conclusion).toBe(true);
+            }
+          } catch (error) {
+            const spokenPhraseLog = await nvda.spokenPhraseLog();
+            const intermediateSteps = agentOutput ? JSON.stringify(agentOutput.intermediateSteps, null, 2) : "Agent did not produce intermediate steps.";
+
+            failures.push({
+              goal: item.goal,
+              intermediateSteps,
+              spokenPhraseLog,
+              error,
+            });
+
+            throw error;
           }
         });
+      });
+
+      test.afterAll(async () => {
+        if (failures.length > 0) {
+          let issueContent = '# Accessibility Test Failures\n\n';
+      
+          failures.forEach(failure => {
+            issueContent += `
+---
+
+## Failed Goal: ${failure.goal}
+
+### Agent Steps
+
+\`\`\`json
+${failure.intermediateSteps}
+\`\`\`
+
+### Screen Reader Log
+
+\`\`\`
+${failure.spokenPhraseLog.join('\n')}
+\`\`\`
+
+### Error
+
+\`\`\`
+${failure.error.message}
+\`\`\`
+`;
+          });
+      
+          fs.writeFileSync('issue.md', issueContent);
+        }
       });
     } catch (error) {
       // Error already handled above, but this is here for completeness.
       console.error("Error reading or parsing JSON file.");
     }
   }
-  
 });
