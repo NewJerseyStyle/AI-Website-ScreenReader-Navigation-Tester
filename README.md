@@ -1,3 +1,5 @@
+> End-of-life: Converting into GitHub Action instead
+
 # AI Website Navigation Testing
 Proof of concept for an AI-powered system that uses a screen reader to assess the user experience (UX) of a website for users with visual impairments. The AI simulates human interaction, providing a report on achieved and failed goals, focusing on ease of use and accessibility.
 
@@ -117,7 +119,3 @@ The AI testing methodology is designed to simulate real-world user interactions.
 1. The AI testing system only consider keyboard navigation. Did not provide insights in touch screen.
 2. The AI may need more instruction in order to control the behavior to mimic specific operation styles (e.g. reading each element on website vs jumping to next header).
 3. The screen reader support only added for NVDA, VoiceOver also supported by not implemented.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit pull requests.
