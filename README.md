@@ -25,17 +25,16 @@ The specific goals to be achieved by the system are defined in a configuration f
 
 ## Setup and Usage
 
-1.  **Install Dependencies:**
-    *   Ensure you have Node.js, npm and [NVDA](https://www.nvaccess.org/download/) installed.
-    *   Install dependencies and setup the environment for screen reader automation with [setup.sh](setup.sh):
-        ```sh
-        sh setup.sh
-        ```
-2.  **Configure Goals:**
-    *   Create a JSON file (e.g., `goals.json`) to define the testing goals.
-    *   Each goal should be an object in an array with a `"goal"` property. Optionally, you can include an `"expect"` property for expected outcomes for interpretation task.
-    *   You can copy [example-goals.json](example-goals.json):
+The tests are run automatically on every push or pull request to the `main` branch using GitHub Actions.
 
+### Configuration
+
+The test configuration is managed through GitHub Actions secrets and variables.
+
+1.  **Configure Goals:**
+    *   The test goals are defined in a JSON file. You can modify the `example-goals.json` file to define your own goals.
+    *   Each goal should be an object in an array with a `"goal"` property. Optionally, you can include an `"expect"` property for expected outcomes for interpretation task.
+    *   Example `example-goals.json`:
         ```json
         [
             {
@@ -47,24 +46,37 @@ The specific goals to be achieved by the system are defined in a configuration f
             }
         ]
         ```
-3.  **Configure Environment Variables:**
-    *   Create a `.env` file in the project directory and add your Groq API key and model information:
 
-        ```env
-        GROQ_API_KEY=your-api-key
-        GROQ_MODEL=llama-3.3-70b-versatile
-        GROQ_MODEL_TEMP=0
-        TEST_ENTRY_URL=your-home-page-url
-        TEST_CASE_JSON_PATH=example-goals.json
-        ```
-4.  **Run the Test:**
-    *   Execute the tests using Playwright:
+2.  **Configure Environment Variables:**
+    *   The environment variables for the test are defined in the `.github/workflows/node.js.yml` file and should be configured in your repository's "Settings" > "Secrets and variables" > "Actions".
+    *   **Secrets:**
+        *   `GROQ_API_KEY`: Your Groq API key. This should be stored as a secret.
+    *   **Variables:**
+        *   `GROQ_MODEL`: The Groq model to use (e.g., `llama-3.3-70b-versatile`).
+        *   `GROQ_MODEL_TEMP`: The temperature for the model (e.g., `0`).
+        *   `TEST_ENTRY_URL`: The URL of the website to test.
+        *   `TEST_CASE_JSON_PATH`: The path to the JSON file containing the test goals (e.g., `example-goals.json`).
 
-        ```bash
-        npx playwright test
-        ```
+### Running the Tests
 
-    *   In case your system does not support `.env` by default, you may need to run `set -a && source .env && set +a` in your shell first.
+The tests will run automatically when you push a commit to the `main` branch or open a pull request. You can view the test results in the "Actions" tab of your GitHub repository.
+
+For local development, you can still run the tests using Playwright. Make sure you have Node.js and npm installed.
+
+1.  **Install Dependencies:**
+    ```bash
+    npm install
+    ```
+2.  **Install Playwright Browsers:**
+    ```bash
+    npx playwright install --with-deps webkit
+    ```
+3.  **Set Environment Variables:**
+    Create a `.env` file and add the necessary variables (see above).
+4.  **Run Tests:**
+    ```bash
+    npx playwright test
+    ```
 
 
 ## Results
