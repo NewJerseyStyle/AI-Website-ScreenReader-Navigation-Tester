@@ -1,5 +1,5 @@
-const { screenReaderConfig } = require("@guidepup/playwright");
-const { devices } = require("@playwright/test");
+import { screenReaderConfig } from "@guidepup/playwright";
+import { devices } from "@playwright/test";
 
 const config = {
   ...screenReaderConfig,
@@ -14,4 +14,4 @@ const config = {
   ],
 };
 
-module.exports = config;
+export default config;
